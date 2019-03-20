@@ -1,5 +1,6 @@
 from patrowl4py.api import PatrowlManagerApi
-
+import random
+import string
 
 api = PatrowlManagerApi(
     url='http://my.patrowl.io:8000',
@@ -12,8 +13,10 @@ print(api.get_assets_stats())
 print(api.get_asset_by_id(1))
 print(api.get_asset_findings_by_id(1))
 
-# print(api.add_asset(
-#     value="1.1.1.1", name="Test IP address", datatype="ip",
-#     description="n/a", criticity="low", tags=["patrowl", "demo"]
-# ))
-print(api.delete_asset(1288))
+rand_fqdn = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
+new_asset = api.add_asset(
+    value=rand_fqdn, name="Test FQDN", datatype="fqdn",
+    description="n/a", criticity="low", tags=["patrowl", "demo"]
+)
+print(new_asset)
+print(api.delete_asset(new_asset['id']))

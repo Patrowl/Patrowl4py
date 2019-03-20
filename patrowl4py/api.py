@@ -158,20 +158,20 @@ class PatrowlManagerApi:
         """
         Get a scan identified by his ID.
 
-        :param status: Status
-        :param title: Title icontains
         :param scan_id: Scan ID
         :rtype: json
         """
         try:
             return self.sess.get(self.url+"/scans/api/v1/by-id/{}".format(scan_id)).json()
         except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve asset: {}".format(e))
+            raise PatrowlException("Unable to retrieve scan: {}".format(e))
 
     def get_scans(self, status=None, title=None, limit=None):
         """
         Get performed scans.
 
+        :param status: Status
+        :param title: Title icontains
         :param limit: Max number of results to return
         :rtype: json
         """
@@ -186,3 +186,145 @@ class PatrowlManagerApi:
             return self.sess.get(self.url+"/scans/api/v1/list?{}".format(criterias)).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to retrieve scans: {}".format(e))
+
+    def get_scan_definition_by_id(self, scan_id):
+        """
+        Get a scan definition identified by his ID.
+
+        :param scan_id: Scan definition ID
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/scans/api/v1/defs/by-id/{}".format(scan_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve scan: {}".format(e))
+
+    def get_scan_definitions(self):
+        """
+        Get scan definitions.
+
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/scans/api/v1/defs/list").json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve scans definitions: {}".format(e))
+
+
+    # Engines
+    def get_engine_instances(self):
+        """
+        Get engine instances.
+
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/engines/api/v1/instances/list").json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve engines: {}".format(e))
+
+    def get_engine_instance_by_id(self, engine_id):
+        """
+        Get a engine instance by his ID.
+
+        :param engine_id: Engine instance ID
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/engines/api/v1/instances/by-id/{}".format(engine_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve engine: {}".format(e))
+
+    def get_engines(self):
+        """
+        Get engines.
+
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/engines/api/v1/list").json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve engines: {}".format(e))
+
+    def get_engine_by_id(self, engine_id):
+        """
+        Get a engine by his ID.
+
+        :param engine_id: Engine ID
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/engines/api/v1/by-id/{}".format(engine_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve engine: {}".format(e))
+
+    def get_engine_policies(self):
+        """
+        Get engine policies.
+
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/engines/api/v1/policies/list").json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve engine policies: {}".format(e))
+
+    def get_engine_policy(self, engine_policy_id):
+        """
+        Get a engine policy by his ID.
+
+        :param engine_policy_id: Engine policy ID
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/engines/api/v1/policies/by-id/{}".format(engine_policy_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve engine policy: {}".format(e))
+
+    # Rules
+    def get_alerting_rules(self):
+        """
+        Get rules.
+
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/rules/api/v1/alerting/list").json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve alerting rules: {}".format(e))
+
+    def get_alerting_rule(self, rule_id):
+        """
+        Get an alerting rule by his ID.
+
+        :param rule_id: Alerting rule ID
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/rules/api/v1/alerting/by-id/{}".format(rule_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve alerting rule: {}".format(e))
+
+    def delete_alerting_rule(self, rule_id):
+        """
+        Delete an alerting rule by his ID.
+
+        :param rule_id: Alerting rule ID
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/rules/api/v1/alerting/delete/{}".format(rule_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to delete alerting rule: {}".format(e))
+
+    def duplicate_alerting_rule(self, rule_id):
+        """
+        Duplicate an alerting rule by his ID.
+
+        :param rule_id: Alerting rule ID
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/rules/api/v1/alerting/duplicate/{}".format(rule_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to delete alerting rule: {}".format(e))

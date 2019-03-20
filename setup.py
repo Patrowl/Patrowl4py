@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Patrowl4py',
-    version='0.0.1',
+    version='1.0.0',
     description='Python API client for Patrowl',
     url='https://github.com/Patrowl/Patrowl4py',
     author='Nicolas Mattiocco',
