@@ -211,6 +211,56 @@ class PatrowlManagerApi:
             raise PatrowlException("Unable to retrieve scans definitions: {}".format(e))
 
 
+    def add_scan_definition(self, engine_policy, title, description,
+        engine_id=None, scan_type="single", every=None, period=None,
+        scheduled_at=None, start_scan="now", assets=None, assetgroups=None):
+        """
+        Create a scan definition
+
+        :param engine_policy: ID of the scan policy
+        :param engine_id: ID of the engine of instance or None
+        :param scan_type: single/scheduled/periodic
+        :param every: [periodic scan] frequency
+        :param period: [periodic scan] seconds/minutes/hours/days
+        :param scheduled_at: [scheduled scan] datetime
+        :param title: Title
+        :param description: Description
+        :param start_scan: now/later/scheduled
+        :param assets: list of assets ID
+        :param assetgroups: list of asset groups ID
+        :rtype: json
+        """
+        if scan_type not in ["single", "scheduled", "periodic"]:
+            raise PatrowlException("Unable to create scan (scan_type error): {}".format(scan_type))
+        if scan_type == "scheduled" and period not in ["seconds", "minutes", "hours", "days"]:
+            raise PatrowlException("Unable to create scan (scan_type/period error): {}".format(period))
+        if start_scan not in ["now", "scheduled", "later"]:
+            raise PatrowlException("Unable to create scan (start_scan error): {}".format(start_scan))
+        if assets is not None and not isinstance(assets, list):
+            raise PatrowlException("Unable to create scan (asset error): {}".format(assets))
+        if assetgroups is not None and not isinstance(assetgroups, list):
+            raise PatrowlException("Unable to create scan (assetgroup error): {}".format(assetgroups))
+
+        data = {
+            "engine_policy": engine_policy,
+            "engine_id": engine_id,
+            "scan_type": scan_type,
+            "title": title,
+            "description": description,
+            "scan_type": scan_type,
+            "every": every,
+            "period": period,
+            "scheduled_at": scheduled_at,
+            "start_scan": start_scan,
+            "assets": assets,
+            "assetgroups": assetgroups
+        }
+        try:
+            return self.sess.post(self.url+"/scans/api/v1/defs/add", data=data).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to create scan definition (unknown): {}".format(e))
+
+
     # Engines
     def get_engine_instances(self):
         """

@@ -1,4 +1,5 @@
 from patrowl4py.api import PatrowlManagerApi
+import time
 
 
 api = PatrowlManagerApi(
@@ -7,6 +8,20 @@ api = PatrowlManagerApi(
 )
 
 # Scan definitions
+print(api.add_scan_definition(
+    engine_policy=1,
+    engine_id=1,
+    title="Patrowl4py single test scan ({})".format(time.time()),
+    description="Patrowl4py test scan",
+    scan_type="single",
+    every=None,
+    period=None,
+    scheduled_at=None,
+    start_scan="now",
+    assets=[1, 1284],
+    assetgroups=None
+    # assetgroups=[7]
+))
 print(api.get_scan_definitions())
 print(api.get_scan_definition_by_id(1))
 
