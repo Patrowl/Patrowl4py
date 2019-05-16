@@ -115,6 +115,71 @@ class PatrowlManagerApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to delete asset: {}".format(e))
 
+    def get_assetgroups(self):
+        """
+        Get all asset groups.
+
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/assets/api/v1/groups/list").json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve asset groups: {}".format(e))
+
+    def get_assetgroup_by_id(self, assetgroup_id):
+        """
+        Get an asset group identified by his ID.
+
+        :param asset_id: Asset ID
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/assets/api/v1/groups/by-id/{}".format(assetgroup_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve asset group: {}".format(e))
+
+    def add_assetgroup(self, name, description, criticity, assets, tags=["All"]):
+        """
+        Create an asset group
+
+        :param name: Name of the asset
+        :param description: Description
+        :param criticity: Criticity (low, medium, high)
+        :param tags: Categories
+        :type tags: list of str
+        :param assets: Assets ID
+        :type assets: list of int
+        :rtype: json
+        """
+        if not criticity or not any(criticity in d for d in ASSET_CRITICITIES):
+            raise PatrowlException("Unable to create asset (criticity error): {}".format(criticity))
+        if tags is None or not isinstance(tags, list):
+            raise PatrowlException("Unable to create asset (tags error): {}".format(tags))
+
+        data = {
+            "name": name,
+            "description": description,
+            "criticity": criticity,
+            "assets": assets,
+            "tags": tags
+        }
+        try:
+            return self.sess.put(self.url+"/assets/api/v1/groups/add", data=data).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to create asset group (unknown): {}".format(e))
+
+    def delete_assetgroup(self, assetgroup_id):
+        """
+        Delete an asset group.
+
+        :param assetgroup_id: Asset group ID
+        :rtype: json
+        """
+        try:
+            return self.sess.delete(self.url+"/assets/api/v1/groups/delete/{}".format(assetgroup_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to delete asset group: {}".format(e))
+
     # Findings
     def get_findings(self, status=None, title=None, severity=None, scopes=None, limit=None):
         """
