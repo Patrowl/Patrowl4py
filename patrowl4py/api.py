@@ -325,6 +325,17 @@ class PatrowlManagerApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to create scan definition (unknown): {}".format(e))
 
+    def delete_scan_definition(self, scan_id):
+        """
+        Delete a scan definition
+
+        :param scan_id: ID of the scan definition
+        """
+        try:
+            return self.sess.delete(self.url+"/scans/api/v1/defs/delete/{}".format(scan_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to create scan definition (unknown): {}".format(e))
+
 
     # Engines
     def get_engine_instances(self):
