@@ -59,6 +59,18 @@ class PatrowlManagerApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to retrieve asset: {}".format(e))
 
+    def ack_asset_by_id(self, asset_id):
+        """
+        Ack an asset identified by his ID.
+
+        :param asset_id: Asset ID
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/assets/api/v1/by-id/{}/ack".format(asset_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve asset: {}".format(e))
+
     def get_asset_findings_by_id(self, asset_id):
         """
         Get findings found on an asset.
@@ -215,6 +227,18 @@ class PatrowlManagerApi:
         """
         try:
             return self.sess.get(self.url+"/findings/api/v1/by-id/{}".format(finding_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve findings: {}".format(e))
+
+    def ack_finding(self, finding_id):
+        """
+        Ack an finding identified by his ID.
+
+        :param finding_id: Finding ID
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/findings/api/v1/{}/ack".format(finding_id)).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to retrieve findings: {}".format(e))
 
