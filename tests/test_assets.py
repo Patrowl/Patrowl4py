@@ -11,6 +11,7 @@ api = PatrowlManagerApi(
 print(api.get_assets())
 print(api.get_assets_stats())
 print(api.get_asset_by_id(1))
+print(api.ack_asset_by_id(1))
 print(api.get_asset_findings_by_id(1))
 
 rand_fqdn = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
