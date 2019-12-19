@@ -242,6 +242,39 @@ class PatrowlManagerApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to retrieve findings: {}".format(e))
 
+    def add_finding(self, title, description, finding_type, severity, asset, tags=[]):
+        """
+        Create a finding
+
+        :param title: Title of the finding
+        :param description: Description of the finding
+        :param finding_type: Type of the finding
+        :param severity: Severity of the finding
+        :param links: Links of the finding
+        :type links: list of str
+        :param tags: Categories
+        :type tags: list of str
+        :rtype: json
+        """
+
+        data = {
+            "title": title,
+            "description": description,
+            "type": finding_type,
+            'severity': severity,
+            'solution': '',
+            'risk_info': '',
+            'vuln_refs': '',
+            'links': [],
+            'tags': tags,
+            'status': 'new',
+            'asset': asset,
+        }
+        try:
+            return self.sess.post(self.url+"/findings/api/v1/add", data=data).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to create finding (unknown): {}".format(e))
+
     # Scans
     def get_scan_by_id(self, scan_id):
         """
