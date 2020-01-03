@@ -306,6 +306,21 @@ class PatrowlManagerApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to create finding (unknown): {}".format(e))
 
+    def delete_finding(self, finding_id):
+        """
+        Delete a finding
+
+        :param finding_id: ID of the finding
+        :rtype: json
+        """
+        data = {
+            finding_id: "delete me"
+        }
+        try:
+            return self.sess.post(self.url+"/findings/api/v1/delete", data=data).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to delete findings (unknown): {}".format(e))
+
     # Scans
     def get_scan_by_id(self, scan_id):
         """
