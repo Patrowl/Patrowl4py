@@ -439,6 +439,17 @@ class PatrowlManagerApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to create scan definition (unknown): {}".format(e))
 
+    def run_scan_definitions(self, scan_id):
+        """
+        Run scan definitions
+
+        :param scan_id: ID of the scan definition
+        """
+        try:
+            return self.sess.get(self.url+"/scans/api/v1/defs/run/{}".format(scan_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to run scans definitions: {}".format(e))
+
 
     # Engines
     def get_engine_instances(self):
