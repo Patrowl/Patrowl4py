@@ -224,14 +224,20 @@ class PatrowlManagerApi:
             raise PatrowlException("Unable to delete asset group: {}".format(e))
 
     # Findings
-    def get_findings(self, status=None, title=None, severity=None, scopes=None, limit=None):
+    def get_findings(
+            self,
+            status=None,
+            title=None,
+            severity=None,
+            engine_type=None,
+            finding_type=None,
+            limit=None):
         """
         Get findings.
 
         :param status: Status
         :param title: Title icontains
         :param severity: Severity
-        :param scopes: Scopes ID
         :param limit: Max number of results to return
         :rtype: json
         """
@@ -244,10 +250,17 @@ class PatrowlManagerApi:
             criterias += "&_status={}&_status_cond=exact".format(status)
         if severity and any(severity in a for a in FINDING_SEVERITIES):
             criterias += "&_severity={}&_severity_cond=exact".format(severity)
+        if engine_type:
+            criterias += "&_engine={}".format(engine_type)
+        if finding_type:
+            criterias += "&_type={}&_type_cond=exact".format(finding_type)
         try:
-            return self.sess.get(self.url+"/findings/api/v1/list?{}".format(criterias)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve findings: {}".format(e))
+            req = self.sess.get(self.url+"/findings/api/v1/list?{}".format(criterias))
+            if not req.ok:
+                raise PatrowlException("Unable to retrieve findings: {}".format(req.text))
+            return req.json()
+        except requests.exceptions.RequestException as err_msg:
+            raise PatrowlException("Unable to retrieve findings: {}".format(err_msg))
 
     def get_finding(self, finding_id):
         """
@@ -257,9 +270,12 @@ class PatrowlManagerApi:
         :rtype: json
         """
         try:
-            return self.sess.get(self.url+"/findings/api/v1/by-id/{}".format(finding_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve findings: {}".format(e))
+            req = self.sess.get(self.url+"/findings/api/v1/by-id/{}".format(finding_id))
+            if not req.ok:
+                raise PatrowlException("Unable to retrieve finding: {}".format(req.text))
+            return req.json()
+        except requests.exceptions.RequestException as err_msg:
+            raise PatrowlException("Unable to retrieve finding: {}".format(err_msg))
 
     def ack_finding(self, finding_id):
         """
@@ -269,11 +285,21 @@ class PatrowlManagerApi:
         :rtype: json
         """
         try:
-            return self.sess.get(self.url+"/findings/api/v1/{}/ack".format(finding_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve findings: {}".format(e))
+            req = self.sess.get(self.url+"/findings/api/v1/{}/ack".format(finding_id))
+            if not req.ok:
+                raise PatrowlException("Unable to ack finding: {}".format(req.text))
+            return req.json()
+        except requests.exceptions.RequestException as err_msg:
+            raise PatrowlException("Unable to ack finding: {}".format(err_msg))
 
-    def add_finding(self, title, description, finding_type, severity, asset, tags=[]):
+    def add_finding(
+            self,
+            title,
+            description,
+            finding_type,
+            severity,
+            asset,
+            status='new'):
         """
         Create a finding
 
@@ -281,10 +307,6 @@ class PatrowlManagerApi:
         :param description: Description of the finding
         :param finding_type: Type of the finding
         :param severity: Severity of the finding
-        :param links: Links of the finding
-        :type links: list of str
-        :param tags: Categories
-        :type tags: list of str
         :rtype: json
         """
 
@@ -297,18 +319,59 @@ class PatrowlManagerApi:
             'risk_info': '',
             'vuln_refs': '',
             'links': [],
-            'tags': tags,
-            'status': 'new',
+            'tags': [],
+            'status': status,
             'asset': asset,
         }
         try:
-            return self.sess.post(self.url+"/findings/api/v1/add", data=data).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to create finding (unknown): {}".format(e))
+            req = self.sess.post(self.url+"/findings/api/v1/add", data=data)
+            if not req.ok:
+                raise PatrowlException("Unable to create finding: {}".format(req.text))
+            return req.json()
+        except requests.exceptions.RequestException as err_msg:
+            raise PatrowlException("Unable to create finding (unknown): {}".format(err_msg))
+
+    def update_finding(
+            self,
+            finding_id,
+            scan=None,
+            title=None,
+            description=None,
+            finding_type=None,
+            severity=None):
+        """
+        Update a finding
+
+        :param finding_id: ID of the finding
+        :param title: Title of the finding
+        :param description: Description of the finding
+        :param finding_type: Type of the finding
+        :param severity: Severity of the finding
+        :rtype: json
+        """
+
+        criterias = ""
+        if scan or scan == '':
+            criterias += "&scan={}".format(scan)
+        if title:
+            criterias += "&title={}".format(title)
+        if description:
+            criterias += "&description={}".format(description)
+        if finding_type:
+            criterias += "&type={}".format(finding_type)
+        if severity:
+            criterias += "&severity={}".format(severity)
+        try:
+            req = self.sess.get(self.url+"/findings/api/v1/update/{}?{}".format(finding_id, criterias))
+            if not req.ok:
+                raise PatrowlException("Unable to create finding: {}".format(req.text))
+            return req.json()
+        except requests.exceptions.RequestException as err_msg:
+            raise PatrowlException("Unable to update finding (unknown): {}".format(err_msg))
 
     def delete_finding(self, finding_id):
         """
-        Delete a finding
+        Create a finding
 
         :param finding_id: ID of the finding
         :rtype: json
@@ -317,9 +380,12 @@ class PatrowlManagerApi:
             finding_id: "delete me"
         }
         try:
-            return self.sess.post(self.url+"/findings/api/v1/delete", data=data).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to delete findings (unknown): {}".format(e))
+            req = self.sess.post(self.url+"/findings/api/v1/delete", data=data)
+            if not req.ok:
+                raise PatrowlException("Unable to delete finding: {}".format(req.text))
+            return req.json()
+        except requests.exceptions.RequestException as err_msg:
+            raise PatrowlException("Unable to delete finding (unknown): {}".format(err_msg))
 
     # Scans
     def get_scan_by_id(self, scan_id):
@@ -449,7 +515,6 @@ class PatrowlManagerApi:
             return self.sess.get(self.url+"/scans/api/v1/defs/run/{}".format(scan_id)).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to run scans definitions: {}".format(e))
-
 
     # Engines
     def get_engine_instances(self):
