@@ -180,6 +180,37 @@ class PatrowlManagerApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to create asset group (unknown): {}".format(e))
 
+    def edit_assetgroup(self, assetgroup_id, name, description, criticity, assets, tags=["All"]):
+        """
+        Edit an asset group
+
+        :param assetgroup_id: Asset group ID
+        :param name: Name of the asset
+        :param description: Description
+        :param criticity: Criticity (low, medium, high)
+        :type tags: list of str
+        :param assets: Assets ID
+        :type assets: list of int
+        :rtype: json
+        """
+        if not criticity or not any(criticity in d for d in ASSET_CRITICITIES):
+            raise PatrowlException("Unable to edit assetgroup (criticity error): {}".format(criticity))
+        if tags is None or not isinstance(tags, list):
+            raise PatrowlException("Unable to edit assetgroup (tags error): {}".format(tags))
+
+        data = {
+            "name": name,
+            "description": description,
+            "criticity": criticity,
+            "assets": assets,
+            "tags": tags
+        }
+        try:
+            return self.sess.post(self.url+"/assets/api/v1/groups/edit/{}".format(assetgroup_id), data=data).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to edit asset group (unknown): {}".format(e))
+
+
     def delete_assetgroup(self, assetgroup_id):
         """
         Delete an asset group.
@@ -274,6 +305,21 @@ class PatrowlManagerApi:
             return self.sess.post(self.url+"/findings/api/v1/add", data=data).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to create finding (unknown): {}".format(e))
+
+    def delete_finding(self, finding_id):
+        """
+        Delete a finding
+
+        :param finding_id: ID of the finding
+        :rtype: json
+        """
+        data = {
+            finding_id: "delete me"
+        }
+        try:
+            return self.sess.post(self.url+"/findings/api/v1/delete", data=data).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to delete findings (unknown): {}".format(e))
 
     # Scans
     def get_scan_by_id(self, scan_id):
@@ -392,6 +438,17 @@ class PatrowlManagerApi:
             return self.sess.delete(self.url+"/scans/api/v1/defs/delete/{}".format(scan_id)).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to create scan definition (unknown): {}".format(e))
+
+    def run_scan_definitions(self, scan_id):
+        """
+        Run scan definitions
+
+        :param scan_id: ID of the scan definition
+        """
+        try:
+            return self.sess.get(self.url+"/scans/api/v1/defs/run/{}".format(scan_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to run scans definitions: {}".format(e))
 
 
     # Engines
