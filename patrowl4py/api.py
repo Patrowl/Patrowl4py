@@ -1,5 +1,12 @@
+#!/usr/bin/env python
+"""
+Patrowl4py api
+"""
+
+# Third party library imports
 import requests
 
+# Own library imports
 from patrowl4py.exceptions import PatrowlException
 from patrowl4py.constants import *
 
@@ -24,6 +31,19 @@ class PatrowlManagerApi:
         self.sess.verify = ssl_verify
         self.sess.timeout = timeout
 
+    def patrowl_request(self, request, path, error_message, payload=None):
+        """
+        This function is fetching the response with GET method and
+        handeling errors
+        """
+        try:
+            req = request(self.url+path, data=payload)
+            if not req.ok:
+                raise PatrowlException("{}: {}".format(error_message, req.text))
+            return req.json()
+        except requests.exceptions.RequestException as err_msg:
+            raise PatrowlException("{}: {}".format(error_message, err_msg))
+
     # Assets
     def get_assets(self):
         """
@@ -31,10 +51,10 @@ class PatrowlManagerApi:
 
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/assets/api/v1/list").json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve assets: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/assets/api/v1/list',
+            'Unable to retrieve assets')
 
     def get_assets_stats(self):
         """
@@ -42,10 +62,10 @@ class PatrowlManagerApi:
 
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/assets/api/v1/stats").json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve asset: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/assets/api/v1/stats',
+            'Unable to retrieve assets stats')
 
     def get_asset_by_id(self, asset_id):
         """
@@ -54,10 +74,10 @@ class PatrowlManagerApi:
         :param asset_id: Asset ID
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/assets/api/v1/by-id/{}".format(asset_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve asset: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/assets/api/v1/by-id/{}'.format(asset_id),
+            'Unable to retrieve asset')
 
     def ack_asset_by_id(self, asset_id):
         """
@@ -66,10 +86,10 @@ class PatrowlManagerApi:
         :param asset_id: Asset ID
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/assets/api/v1/by-id/{}/ack".format(asset_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve asset: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/assets/api/v1/by-id/{}/ack'.format(asset_id),
+            'Unable to ack asset')
 
     def get_asset_findings_by_id(self, asset_id):
         """
@@ -78,10 +98,10 @@ class PatrowlManagerApi:
         :param asset_id: Asset ID
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/assets/api/v1/by-id/{}/findings".format(asset_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve findings: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/assets/api/v1/by-id/{}/findings'.format(asset_id),
+            'Unable to retrieve asset findings')
 
     def add_asset(self, value, name, datatype, description, criticity, tags=["All"]):
         """
@@ -110,10 +130,11 @@ class PatrowlManagerApi:
             "criticity": criticity,
             "tags": tags
         }
-        try:
-            return self.sess.put(self.url+"/assets/api/v1/add", data=data).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to create asset (unknown): {}".format(e))
+        return self.patrowl_request(
+            self.sess.put,
+            '/assets/api/v1/add',
+            'Unable to create asset',
+            payload=data)
 
     def delete_asset(self, asset_id):
         """
@@ -122,10 +143,10 @@ class PatrowlManagerApi:
         :param asset_id: Asset ID
         :rtype: json
         """
-        try:
-            return self.sess.delete(self.url+"/assets/api/v1/delete/{}".format(asset_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to delete asset: {}".format(e))
+        return self.patrowl_request(
+            self.sess.delete,
+            '/assets/api/v1/delete/{}'.format(asset_id),
+            'Unable to delete asset')
 
     def get_assetgroups(self):
         """
@@ -133,10 +154,10 @@ class PatrowlManagerApi:
 
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/assets/api/v1/groups/list").json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve asset groups: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/assets/api/v1/groups/list',
+            'Unable to retrieve asset groups')
 
     def get_assetgroup_by_id(self, assetgroup_id):
         """
@@ -145,10 +166,10 @@ class PatrowlManagerApi:
         :param asset_id: Asset ID
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/assets/api/v1/groups/by-id/{}".format(assetgroup_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve asset group: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/assets/api/v1/groups/by-id/{}'.format(assetgroup_id),
+            'Unable to retrieve asset group')
 
     def add_assetgroup(self, name, description, criticity, assets, tags=["All"]):
         """
@@ -175,10 +196,11 @@ class PatrowlManagerApi:
             "assets": assets,
             "tags": tags
         }
-        try:
-            return self.sess.put(self.url+"/assets/api/v1/groups/add", data=data).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to create asset group (unknown): {}".format(e))
+        return self.patrowl_request(
+            self.sess.put,
+            '/assets/api/v1/groups/add',
+            'Unable to create asset group',
+            payload=data)
 
     def edit_assetgroup(self, assetgroup_id, name, description, criticity, assets, tags=["All"]):
         """
@@ -205,11 +227,11 @@ class PatrowlManagerApi:
             "assets": assets,
             "tags": tags
         }
-        try:
-            return self.sess.post(self.url+"/assets/api/v1/groups/edit/{}".format(assetgroup_id), data=data).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to edit asset group (unknown): {}".format(e))
-
+        return self.patrowl_request(
+            self.sess.post,
+            '/assets/api/v1/groups/edit/{}'.format(assetgroup_id),
+            'Unable to edit asset group',
+            payload=data)
 
     def delete_assetgroup(self, assetgroup_id):
         """
@@ -218,10 +240,10 @@ class PatrowlManagerApi:
         :param assetgroup_id: Asset group ID
         :rtype: json
         """
-        try:
-            return self.sess.delete(self.url+"/assets/api/v1/groups/delete/{}".format(assetgroup_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to delete asset group: {}".format(e))
+        return self.patrowl_request(
+            self.sess.delete,
+            '/assets/api/v1/groups/delete/{}'.format(assetgroup_id),
+            'Unable to delete asset group')
 
     # Findings
     def get_findings(
@@ -254,13 +276,10 @@ class PatrowlManagerApi:
             criterias += "&_engine={}".format(engine_type)
         if finding_type:
             criterias += "&_type={}&_type_cond=exact".format(finding_type)
-        try:
-            req = self.sess.get(self.url+"/findings/api/v1/list?{}".format(criterias))
-            if not req.ok:
-                raise PatrowlException("Unable to retrieve findings: {}".format(req.text))
-            return req.json()
-        except requests.exceptions.RequestException as err_msg:
-            raise PatrowlException("Unable to retrieve findings: {}".format(err_msg))
+        return self.patrowl_request(
+            self.sess.get,
+            '/findings/api/v1/list?{}'.format(criterias),
+            'Unable to retrieve findings')
 
     def get_finding(self, finding_id):
         """
@@ -269,13 +288,10 @@ class PatrowlManagerApi:
         :param finding_id: Finding ID
         :rtype: json
         """
-        try:
-            req = self.sess.get(self.url+"/findings/api/v1/by-id/{}".format(finding_id))
-            if not req.ok:
-                raise PatrowlException("Unable to retrieve finding: {}".format(req.text))
-            return req.json()
-        except requests.exceptions.RequestException as err_msg:
-            raise PatrowlException("Unable to retrieve finding: {}".format(err_msg))
+        return self.patrowl_request(
+            self.sess.get,
+            '/findings/api/v1/by-id/{}'.format(finding_id),
+            'Unable to retrieve finding')
 
     def ack_finding(self, finding_id):
         """
@@ -284,13 +300,10 @@ class PatrowlManagerApi:
         :param finding_id: Finding ID
         :rtype: json
         """
-        try:
-            req = self.sess.get(self.url+"/findings/api/v1/{}/ack".format(finding_id))
-            if not req.ok:
-                raise PatrowlException("Unable to ack finding: {}".format(req.text))
-            return req.json()
-        except requests.exceptions.RequestException as err_msg:
-            raise PatrowlException("Unable to ack finding: {}".format(err_msg))
+        return self.patrowl_request(
+            self.sess.get,
+            '/findings/api/v1/{}/ack'.format(finding_id),
+            'Unable to ack finding')
 
     def add_finding(
             self,
@@ -323,13 +336,11 @@ class PatrowlManagerApi:
             'status': status,
             'asset': asset,
         }
-        try:
-            req = self.sess.post(self.url+"/findings/api/v1/add", data=data)
-            if not req.ok:
-                raise PatrowlException("Unable to create finding: {}".format(req.text))
-            return req.json()
-        except requests.exceptions.RequestException as err_msg:
-            raise PatrowlException("Unable to create finding (unknown): {}".format(err_msg))
+        return self.patrowl_request(
+            self.sess.post,
+            '/findings/api/v1/add',
+            'Unable to create finding',
+            payload=data)
 
     def update_finding(
             self,
@@ -349,7 +360,6 @@ class PatrowlManagerApi:
         :param severity: Severity of the finding
         :rtype: json
         """
-
         criterias = ""
         if scan or scan == '':
             criterias += "&scan={}".format(scan)
@@ -361,13 +371,10 @@ class PatrowlManagerApi:
             criterias += "&type={}".format(finding_type)
         if severity:
             criterias += "&severity={}".format(severity)
-        try:
-            req = self.sess.get(self.url+"/findings/api/v1/update/{}?{}".format(finding_id, criterias))
-            if not req.ok:
-                raise PatrowlException("Unable to create finding: {}".format(req.text))
-            return req.json()
-        except requests.exceptions.RequestException as err_msg:
-            raise PatrowlException("Unable to update finding (unknown): {}".format(err_msg))
+        return self.patrowl_request(
+            self.sess.get,
+            '/findings/api/v1/update/{}?{}'.format(finding_id, criterias),
+            'Unable to update finding')
 
     def delete_finding(self, finding_id):
         """
@@ -379,13 +386,11 @@ class PatrowlManagerApi:
         data = {
             finding_id: "delete me"
         }
-        try:
-            req = self.sess.post(self.url+"/findings/api/v1/delete", data=data)
-            if not req.ok:
-                raise PatrowlException("Unable to delete finding: {}".format(req.text))
-            return req.json()
-        except requests.exceptions.RequestException as err_msg:
-            raise PatrowlException("Unable to delete finding (unknown): {}".format(err_msg))
+        return self.patrowl_request(
+            self.sess.post,
+            '/findings/api/v1/delete',
+            'Unable to delete finding',
+            payload=data)
 
     # Scans
     def get_scan_by_id(self, scan_id):
@@ -395,10 +400,10 @@ class PatrowlManagerApi:
         :param scan_id: Scan ID
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/scans/api/v1/by-id/{}".format(scan_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve scan: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/scans/api/v1/by-id/{}'.format(scan_id),
+            'Unable to retrieve scan')
 
     def get_scans(self, status=None, title=None, limit=None):
         """
@@ -416,10 +421,21 @@ class PatrowlManagerApi:
             criterias += "&_title={}&_title_cond=icontains".format(title)
         if status and status in SCAN_STATUS:
             criterias += "&_status={}&_status_cond=exact".format(status)
-        try:
-            return self.sess.get(self.url+"/scans/api/v1/list?{}".format(criterias)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve scans: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/scans/api/v1/list?{}'.format(criterias),
+            'Unable to retrieve scans')
+
+    def delete_scan_by_id(self, scan_id):
+        """
+        Delete a scan by its ID
+
+        :param scan_id: ID of the scan
+        """
+        return self.patrowl_request(
+            self.sess.delete,
+            '/scans/api/v1/delete/{}'.format(scan_id),
+            'Unable to delete scan')
 
     def get_scan_definition_by_id(self, scan_id):
         """
@@ -428,10 +444,10 @@ class PatrowlManagerApi:
         :param scan_id: Scan definition ID
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/scans/api/v1/defs/by-id/{}".format(scan_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve scan: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/scans/api/v1/defs/by-id/{}'.format(scan_id),
+            'Unable to retrieve scan')
 
     def get_scan_definitions(self):
         """
@@ -439,11 +455,10 @@ class PatrowlManagerApi:
 
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/scans/api/v1/defs/list").json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve scans definitions: {}".format(e))
-
+        return self.patrowl_request(
+            self.sess.get,
+            '/scans/api/v1/defs/list',
+            'Unable to retrieve scans definitions')
 
     def add_scan_definition(self, engine_policy, title, description,
         engine_id=None, scan_type="single", every=None, period=None,
@@ -489,10 +504,11 @@ class PatrowlManagerApi:
             "assets": assets,
             "assetgroups": assetgroups
         }
-        try:
-            return self.sess.post(self.url+"/scans/api/v1/defs/add", data=data).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to create scan definition (unknown): {}".format(e))
+        return self.patrowl_request(
+            self.sess.post,
+            '/scans/api/v1/defs/add',
+            'Unable to create scan definition',
+            payload=data)
 
     def delete_scan_definition(self, scan_id):
         """
@@ -500,10 +516,10 @@ class PatrowlManagerApi:
 
         :param scan_id: ID of the scan definition
         """
-        try:
-            return self.sess.delete(self.url+"/scans/api/v1/defs/delete/{}".format(scan_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to create scan definition (unknown): {}".format(e))
+        return self.patrowl_request(
+            self.sess.delete,
+            '/scans/api/v1/defs/delete/{}'.format(scan_id),
+            'Unable to delete scan definition')
 
     def run_scan_definitions(self, scan_id):
         """
@@ -511,10 +527,10 @@ class PatrowlManagerApi:
 
         :param scan_id: ID of the scan definition
         """
-        try:
-            return self.sess.get(self.url+"/scans/api/v1/defs/run/{}".format(scan_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to run scans definitions: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/scans/api/v1/defs/run/{}'.format(scan_id),
+            'Unable to run scans definitions')
 
     # Engines
     def get_engine_instances(self):
@@ -523,10 +539,10 @@ class PatrowlManagerApi:
 
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/engines/api/v1/instances/list").json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve engines: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/engines/api/v1/instances/list',
+            'Unable to retrieve engines')
 
     def get_engine_instance_by_id(self, engine_id):
         """
@@ -535,10 +551,10 @@ class PatrowlManagerApi:
         :param engine_id: Engine instance ID
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/engines/api/v1/instances/by-id/{}".format(engine_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve engine: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/engines/api/v1/instances/by-id/{}'.format(engine_id),
+            'Unable to retrieve engine')
 
     def get_engines(self):
         """
@@ -546,10 +562,10 @@ class PatrowlManagerApi:
 
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/engines/api/v1/list").json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve engines: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/engines/api/v1/list',
+            'Unable to retrieve engines')
 
     def get_engine_by_id(self, engine_id):
         """
@@ -558,10 +574,10 @@ class PatrowlManagerApi:
         :param engine_id: Engine ID
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/engines/api/v1/by-id/{}".format(engine_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve engine: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/engines/api/v1/by-id/{}'.format(engine_id),
+            'Unable to retrieve engine')
 
     def get_engine_policies(self):
         """
@@ -569,10 +585,10 @@ class PatrowlManagerApi:
 
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/engines/api/v1/policies/list").json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve engine policies: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/engines/api/v1/policies/list',
+            'Unable to retrieve engine policies')
 
     def get_engine_policy(self, engine_policy_id):
         """
@@ -581,10 +597,10 @@ class PatrowlManagerApi:
         :param engine_policy_id: Engine policy ID
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/engines/api/v1/policies/by-id/{}".format(engine_policy_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve engine policy: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/engines/api/v1/policies/by-id/{}'.format(engine_policy_id),
+            'Unable to retrieve engine policy')
 
     # Rules
     def get_alerting_rules(self):
@@ -593,10 +609,10 @@ class PatrowlManagerApi:
 
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/rules/api/v1/alerting/list").json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve alerting rules: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/rules/api/v1/alerting/list',
+            'Unable to retrieve alerting rules')
 
     def get_alerting_rule(self, rule_id):
         """
@@ -605,10 +621,10 @@ class PatrowlManagerApi:
         :param rule_id: Alerting rule ID
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/rules/api/v1/alerting/by-id/{}".format(rule_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to retrieve alerting rule: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/rules/api/v1/alerting/by-id/{}'.format(rule_id),
+            'Unable to retrieve alerting rule')
 
     def delete_alerting_rule(self, rule_id):
         """
@@ -617,10 +633,10 @@ class PatrowlManagerApi:
         :param rule_id: Alerting rule ID
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/rules/api/v1/alerting/delete/{}".format(rule_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to delete alerting rule: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/rules/api/v1/alerting/delete/{}'.format(rule_id),
+            'Unable to delete alerting rule')
 
     def duplicate_alerting_rule(self, rule_id):
         """
@@ -629,7 +645,7 @@ class PatrowlManagerApi:
         :param rule_id: Alerting rule ID
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/rules/api/v1/alerting/duplicate/{}".format(rule_id)).json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to delete alerting rule: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/rules/api/v1/alerting/duplicate/{}'.format(rule_id),
+            'Unable to duplicate alerting rule')
