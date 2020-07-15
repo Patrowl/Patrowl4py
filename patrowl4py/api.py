@@ -628,13 +628,13 @@ class PatrowlManagerApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to delete team user details (pro edition only): {}".format(e))
 
-    def add_team_user(self, team_id, user_id, is_admin=True):
+    def add_team_user(self, team_id, user_id, is_admin=False):
         """
         Create a team.
 
         :param team_id: Team ID
         :param user_id: User ID
-        :param is_admin: Enable admin role
+        :param is_admin: admin role enabled
         :type is_admin: boolean
         :rtype: json
         """
