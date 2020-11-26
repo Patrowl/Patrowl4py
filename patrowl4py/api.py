@@ -5,6 +5,7 @@ Patrowl4py api
 
 # Third party library imports
 import requests
+from slugify import slugify
 
 # Own library imports
 from patrowl4py.exceptions import PatrowlException
@@ -105,7 +106,7 @@ class PatrowlManagerApi:
 
     def add_asset(self, value, name, datatype, description, criticity, tags=["All"]):
         """
-        Create an asset
+        Create an asset.
 
         :param value: Value of the asset
         :param name: Name of the asset
@@ -173,7 +174,7 @@ class PatrowlManagerApi:
 
     def add_assetgroup(self, name, description, criticity, assets, tags=["All"]):
         """
-        Create an asset group
+        Create an asset group.
 
         :param name: Name of the asset
         :param description: Description
@@ -314,7 +315,7 @@ class PatrowlManagerApi:
             asset,
             status='new'):
         """
-        Create a finding
+        Create a finding.
 
         :param title: Title of the finding
         :param description: Description of the finding
@@ -464,7 +465,7 @@ class PatrowlManagerApi:
         engine_id=None, scan_type="single", every=None, period=None,
         scheduled_at=None, start_scan="now", assets=None, assetgroups=None):
         """
-        Create a scan definition
+        Create a scan definition.
 
         :param engine_policy: ID of the scan policy
         :param engine_id: ID of the engine of instance or None
@@ -512,7 +513,7 @@ class PatrowlManagerApi:
 
     def delete_scan_definition(self, scan_id):
         """
-        Delete a scan definition
+        Delete a scan definition.
 
         :param scan_id: ID of the scan definition
         """
@@ -649,3 +650,141 @@ class PatrowlManagerApi:
             self.sess.get,
             '/rules/api/v1/alerting/duplicate/{}'.format(rule_id),
             'Unable to duplicate alerting rule')
+
+    # User
+    def get_users(self):
+        """
+        Get users.
+
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/users/api/v1/list").json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to get users: {}".format(e))
+
+    def get_user_by_id(self, user_id):
+        """
+        Get an user identified by his ID.
+
+        :param user_id: User ID
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/users/api/v1/details/{}".format(user_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve user details: {}".format(e))
+
+    # Teams
+    def get_teams(self):
+        """
+        Get teams (paginated).
+        ** PRO EDITION**
+
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/api-pro/v1/teams/").json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to get teams (pro edition only): {}".format(e))
+
+    def get_team_by_id(self, team_id):
+        """
+        Get a team identified by his ID.
+
+        :param team_id: Team ID
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/api-pro/v1/teams/{}/".format(team_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve team details (pro edition only): {}".format(e))
+
+    def delete_team_by_id(self, team_id):
+        """
+        Delete a team identified by his ID.
+
+        :param team_id: Team ID
+        :rtype: json
+        """
+        try:
+            return self.sess.delete(self.url+"/api-pro/v1/teams/{}/".format(team_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to delete team details (pro edition only): {}".format(e))
+
+    def add_team(self, name, is_active=True):
+        """
+        Create a team.
+
+        :param name: Name of the team
+        :param is_active: Activate the team
+        :type is_active: boolean
+        :rtype: json
+        """
+
+        data = {
+            "name": name,
+            "slug": slugify(name),
+            'is_active': is_active,
+        }
+        try:
+            return self.sess.post(self.url+"/api-pro/v1/teams/", data=data).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to create team (pro edition only): {}".format(e))
+
+    def get_team_users(self):
+        """
+        Get team users (paginated).
+        ** PRO EDITION**
+
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/api-pro/v1/team-users/").json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to get teams (pro edition only): {}".format(e))
+
+    def get_team_user_by_id(self, team_user_id):
+        """
+        Get a team user identified by his ID.
+
+        :param team_user_id: Team user ID
+        :rtype: json
+        """
+        try:
+            return self.sess.get(self.url+"/api-pro/v1/team-users/{}/".format(team_user_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to retrieve team user details (pro edition only): {}".format(e))
+
+    def delete_team_user_by_id(self, team_user_id):
+        """
+        Delete a team user identified by his ID.
+
+        :param team_user_id: Team user ID
+        :rtype: json
+        """
+        try:
+            return self.sess.delete(self.url+"/api-pro/v1/team-users/{}/".format(team_user_id)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to delete team user details (pro edition only): {}".format(e))
+
+    def add_team_user(self, team_id, user_id, is_admin=False):
+        """
+        Create a team.
+
+        :param team_id: Team ID
+        :param user_id: User ID
+        :param is_admin: admin role enabled
+        :type is_admin: boolean
+        :rtype: json
+        """
+
+        data = {
+            "organization": team_id,
+            "user": user_id,
+            'is_admin': is_admin,
+        }
+        try:
+            return self.sess.post(self.url+"/api-pro/v1/team-users/", data=data).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to create team user (pro edition only): {}".format(e))
