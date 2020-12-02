@@ -665,10 +665,10 @@ class PatrowlManagerApi:
 
         :rtype: json
         """
-        try:
-            return self.sess.get(self.url+"/users/api/v1/list").json()
-        except requests.exceptions.RequestException as e:
-            raise PatrowlException("Unable to get users: {}".format(e))
+        return self.patrowl_request(
+            self.sess.get,
+            '/users/api/v1/list',
+            'Unable to get users')
 
     def get_user_by_id(self, user_id):
         """
