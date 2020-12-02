@@ -38,5 +38,7 @@ FINDING_STATUS = (
     ('false-positive', 'False-Positive')
 )
 
+ASSET_EXPOSURES = ['unknown', 'external', 'internal', 'restricted']
+
 # Scans
 SCAN_STATUS = ['created', 'started', 'finished', 'error', 'trashed']
