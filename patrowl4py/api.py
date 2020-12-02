@@ -84,24 +84,29 @@ class PatrowlManagerApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to retrieve findings: {}".format(e))
 
-    def add_asset(self, value, name, datatype, description, criticity, tags=["All"]):
+    def add_asset(self, value, name, datatype, description, criticity, exposure, tags=["All"], teams=[]):
         """
         Create an asset.
 
         :param value: Value of the asset
         :param name: Name of the asset
         :param description: Description
-        :param criticity: Criticity (low, medium, high)
-        :param tags: Categories
+        :param criticity: Criticality (low, medium, high)
+        :param exposure: Exposure (unknown, external, internal, restricted)
+        :param tags: Categories/Tags
         :type tags: list of str
         :rtype: json
         """
         if not datatype or not any(datatype in d for d in ASSET_TYPES):
             raise PatrowlException("Unable to create asset (type error): {}".format(datatype))
-        if not criticity or not any(criticity in d for d in ASSET_CRITICITIES):
+        if not criticity or not any(criticity in c for c in ASSET_CRITICITIES):
             raise PatrowlException("Unable to create asset (criticity error): {}".format(criticity))
+        if not exposure or not any(exposure in e for e in ASSET_EXPOSURES):
+            raise PatrowlException("Unable to create asset (exposure error): {}".format(exposure))
         if tags is None or not isinstance(tags, list):
-            raise PatrowlException("Unable to create asset (tags error): {}".format(tags))
+            raise PatrowlException("Unable to create asset (tags error - should be a list of strings): {}".format(tags))
+        if teams is None or not isinstance(teams, list):
+            raise PatrowlException("Unable to create asset (teams error - should be a list of strings): {}".format(teams))
 
         data = {
             "value": value,
@@ -109,7 +114,9 @@ class PatrowlManagerApi:
             "type": datatype,
             "description": description,
             "criticity": criticity,
-            "tags": tags
+            "exposure": exposure,
+            "tags": tags,
+            "teams": teams,
         }
         try:
             return self.sess.put(self.url+"/assets/api/v1/add", data=data).json()
@@ -551,6 +558,7 @@ class PatrowlManagerApi:
     def get_team_by_id(self, team_id):
         """
         Get a team identified by his ID.
+        ** PRO EDITION**
 
         :param team_id: Team ID
         :rtype: json
@@ -563,6 +571,7 @@ class PatrowlManagerApi:
     def delete_team_by_id(self, team_id):
         """
         Delete a team identified by his ID.
+        ** PRO EDITION**
 
         :param team_id: Team ID
         :rtype: json
@@ -575,6 +584,7 @@ class PatrowlManagerApi:
     def add_team(self, name, is_active=True):
         """
         Create a team.
+        ** PRO EDITION**
 
         :param name: Name of the team
         :param is_active: Activate the team
@@ -607,6 +617,7 @@ class PatrowlManagerApi:
     def get_team_user_by_id(self, team_user_id):
         """
         Get a team user identified by his ID.
+        ** PRO EDITION**
 
         :param team_user_id: Team user ID
         :rtype: json
@@ -619,6 +630,7 @@ class PatrowlManagerApi:
     def delete_team_user_by_id(self, team_user_id):
         """
         Delete a team user identified by his ID.
+        ** PRO EDITION**
 
         :param team_user_id: Team user ID
         :rtype: json
@@ -631,6 +643,7 @@ class PatrowlManagerApi:
     def add_team_user(self, team_id, user_id, is_admin=False):
         """
         Create a team.
+        ** PRO EDITION**
 
         :param team_id: Team ID
         :param user_id: User ID
@@ -648,3 +661,17 @@ class PatrowlManagerApi:
             return self.sess.post(self.url+"/api-pro/v1/team-users/", data=data).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to create team user (pro edition only): {}".format(e))
+
+    # Stats
+    def get_global_stats(self):
+        """
+        Get global usage stats
+        ** PRO EDITION**
+
+        :rtype: json
+        """
+
+        try:
+            return self.sess.get(self.url+"/api-pro/v1/admin/stats").json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlException("Unable to get global usage stats (pro edition only): {}".format(e))
