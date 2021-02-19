@@ -68,6 +68,18 @@ class PatrowlManagerApi:
             '/assets/api/v1/stats',
             'Unable to retrieve assets stats')
 
+    def get_asset_by_value(self, value):
+        """
+        Get an asset identified by his value.
+
+        :param value: Asset value
+        :rtype: json
+        """
+        return self.patrowl_request(
+            self.sess.get,
+            '/assets/api/v1/by-value/{}'.format(value),
+            'Unable to retrieve asset')
+
     def get_asset_by_id(self, asset_id):
         """
         Get an asset identified by his ID.
@@ -167,11 +179,23 @@ class PatrowlManagerApi:
             '/assets/api/v1/groups/list',
             'Unable to retrieve asset groups')
 
+    def get_assetgroup_by_name(self, name):
+        """
+        Get an asset group identified by his Name.
+
+        :param name: Asset group name
+        :rtype: json
+        """
+        return self.patrowl_request(
+            self.sess.get,
+            '/assets/api/v1/groups/by-name/{}'.format(name),
+            'Unable to retrieve asset group')
+
     def get_assetgroup_by_id(self, assetgroup_id):
         """
         Get an asset group identified by his ID.
 
-        :param asset_id: Asset ID
+        :param assetgroup_id: Asset group ID
         :rtype: json
         """
         return self.patrowl_request(
