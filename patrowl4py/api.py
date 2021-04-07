@@ -381,7 +381,8 @@ class PatrowlManagerApi:
             title=None,
             description=None,
             finding_type=None,
-            severity=None):
+            severity=None,
+            status=None):
         """
         Update a finding
 
@@ -390,6 +391,7 @@ class PatrowlManagerApi:
         :param description: Description of the finding
         :param finding_type: Type of the finding
         :param severity: Severity of the finding
+        :param status: Status of the finding
         :rtype: json
         """
         criterias = ""
@@ -403,6 +405,8 @@ class PatrowlManagerApi:
             criterias += "&type={}".format(finding_type)
         if severity:
             criterias += "&severity={}".format(severity)
+        if status:
+            criterias += "&status={}".format(status)
         return self.patrowl_request(
             self.sess.get,
             '/findings/api/v1/update/{}?{}'.format(finding_id, criterias),
