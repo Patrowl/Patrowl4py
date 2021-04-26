@@ -33,10 +33,7 @@ class PatrowlManagerApi:
         self.sess.timeout = timeout
 
     def patrowl_request(self, request, path, error_message, payload=None):
-        """
-        This function is fetching the response with GET method and
-        handeling errors
-        """
+        """Fetch the response with GET method and handle errors."""
         try:
             req = request(self.url+path, data=payload)
             if not req.ok:
@@ -46,15 +43,19 @@ class PatrowlManagerApi:
             raise PatrowlException("{}: {}".format(error_message, err_msg))
 
     # Assets
-    def get_assets(self):
+    def get_assets(self, team_id=None):
         """
         Get all assets.
 
+        :param team_id: Team ID (PRO Edition Only)
         :rtype: json
         """
+        url = '/assets/api/v1/list'
+        if team_id is not None and str(team_id).isnumeric():
+            url += '?team_id='+team_id
         return self.patrowl_request(
             self.sess.get,
-            '/assets/api/v1/list',
+            url,
             'Unable to retrieve assets')
 
     def get_assets_stats(self):
@@ -116,7 +117,16 @@ class PatrowlManagerApi:
             '/assets/api/v1/by-id/{}/findings'.format(asset_id),
             'Unable to retrieve asset findings')
 
-    def add_asset(self, value, name, datatype, description, criticity, exposure, tags=["All"], teams=[]):
+    def add_asset(
+            self,
+            value,
+            name,
+            datatype,
+            description,
+            criticity,
+            exposure,
+            tags=["All"],
+            teams=[]):
         """
         Create an asset.
 
@@ -354,7 +364,6 @@ class PatrowlManagerApi:
         :param severity: Severity of the finding
         :rtype: json
         """
-
         data = {
             "title": title,
             "description": description,
@@ -384,7 +393,7 @@ class PatrowlManagerApi:
             severity=None,
             status=None):
         """
-        Update a finding
+        Update a finding.
 
         :param finding_id: ID of the finding
         :param title: Title of the finding
@@ -414,7 +423,7 @@ class PatrowlManagerApi:
 
     def delete_finding(self, finding_id):
         """
-        Create a finding
+        Create a finding.
 
         :param finding_id: ID of the finding
         :rtype: json
@@ -464,7 +473,7 @@ class PatrowlManagerApi:
 
     def delete_scan_by_id(self, scan_id):
         """
-        Delete a scan by its ID
+        Delete a scan by its ID.
 
         :param scan_id: ID of the scan
         """
@@ -559,7 +568,7 @@ class PatrowlManagerApi:
 
     def run_scan_definitions(self, scan_id):
         """
-        Run scan definitions
+        Run scan definition.
 
         :param scan_id: ID of the scan definition
         """
@@ -714,6 +723,7 @@ class PatrowlManagerApi:
     def get_teams(self):
         """
         Get teams (paginated).
+
         ** PRO EDITION**
 
         :rtype: json
@@ -726,6 +736,7 @@ class PatrowlManagerApi:
     def get_team_by_id(self, team_id):
         """
         Get a team identified by his ID.
+
         ** PRO EDITION**
 
         :param team_id: Team ID
@@ -739,6 +750,7 @@ class PatrowlManagerApi:
     def delete_team_by_id(self, team_id):
         """
         Delete a team identified by his ID.
+
         ** PRO EDITION**
 
         :param team_id: Team ID
@@ -752,6 +764,7 @@ class PatrowlManagerApi:
     def add_team(self, name, is_active=True):
         """
         Create a team.
+
         ** PRO EDITION**
 
         :param name: Name of the team
@@ -759,7 +772,6 @@ class PatrowlManagerApi:
         :type is_active: boolean
         :rtype: json
         """
-
         data = {
             "name": name,
             "slug": slugify(name),
@@ -773,6 +785,7 @@ class PatrowlManagerApi:
     def get_team_users(self):
         """
         Get team users (paginated).
+
         ** PRO EDITION**
 
         :rtype: json
@@ -785,6 +798,7 @@ class PatrowlManagerApi:
     def get_team_user_by_id(self, team_user_id):
         """
         Get a team user identified by his ID.
+
         ** PRO EDITION**
 
         :param team_user_id: Team user ID
@@ -798,6 +812,7 @@ class PatrowlManagerApi:
     def delete_team_user_by_id(self, team_user_id):
         """
         Delete a team user identified by his ID.
+
         ** PRO EDITION**
 
         :param team_user_id: Team user ID
@@ -811,6 +826,7 @@ class PatrowlManagerApi:
     def add_team_user(self, team_id, user_id, is_admin=False):
         """
         Create a team.
+
         ** PRO EDITION**
 
         :param team_id: Team ID
@@ -819,7 +835,6 @@ class PatrowlManagerApi:
         :type is_admin: boolean
         :rtype: json
         """
-
         data = {
             "organization": team_id,
             "user": user_id,
@@ -833,12 +848,12 @@ class PatrowlManagerApi:
     # Stats
     def get_global_stats(self):
         """
-        Get global usage stats
+        Get global usage stats.
+
         ** PRO EDITION**
 
         :rtype: json
         """
-
         try:
             return self.sess.get(self.url+"/api-pro/v1/admin/stats").json()
         except requests.exceptions.RequestException as e:
