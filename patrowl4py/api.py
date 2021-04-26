@@ -52,7 +52,7 @@ class PatrowlManagerApi:
         """
         url = '/assets/api/v1/list'
         if team_id is not None and str(team_id).isnumeric():
-            url += '?team_id='+team_id
+            url += '?team='+team_id
         return self.patrowl_request(
             self.sess.get,
             url,
