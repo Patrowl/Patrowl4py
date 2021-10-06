@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Patrowl4py',
-    version='1.1.6',
+    version='1.1.7',
     description='Python API for PatrowlManager (Community and Pro editions)',
     url='https://github.com/Patrowl/Patrowl4py',
     author='Nicolas Mattiocco',

@@ -729,7 +729,7 @@ class PatrowlManagerApi:
         :rtype: json
         """
         try:
-            return self.sess.get(self.url+"/api-pro/v1/teams/").json()
+            return self.sess.get(self.url+"/users/api-pro/v1/teams/").json()
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to get teams (pro edition only): {}".format(e))
 
@@ -743,7 +743,7 @@ class PatrowlManagerApi:
         :rtype: json
         """
         try:
-            return self.sess.get(self.url+"/api-pro/v1/teams/{}/".format(team_id)).json()
+            return self.sess.get(self.url+"/users/api-pro/v1/teams/{}/".format(team_id)).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to retrieve team details (pro edition only): {}".format(e))
 
@@ -757,7 +757,7 @@ class PatrowlManagerApi:
         :rtype: json
         """
         try:
-            return self.sess.delete(self.url+"/api-pro/v1/teams/{}/".format(team_id)).json()
+            return self.sess.delete(self.url+"/users/api-pro/v1/teams/{}/".format(team_id)).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to delete team details (pro edition only): {}".format(e))
 
@@ -778,7 +778,7 @@ class PatrowlManagerApi:
             'is_active': is_active,
         }
         try:
-            return self.sess.post(self.url+"/api-pro/v1/teams/", data=data).json()
+            return self.sess.post(self.url+"/users/api-pro/v1/teams/", data=data).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to create team (pro edition only): {}".format(e))
 
@@ -791,7 +791,7 @@ class PatrowlManagerApi:
         :rtype: json
         """
         try:
-            return self.sess.get(self.url+"/api-pro/v1/team-users/").json()
+            return self.sess.get(self.url+"/users/api-pro/v1/team-users/").json()
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to get teams (pro edition only): {}".format(e))
 
@@ -805,7 +805,7 @@ class PatrowlManagerApi:
         :rtype: json
         """
         try:
-            return self.sess.get(self.url+"/api-pro/v1/team-users/{}/".format(team_user_id)).json()
+            return self.sess.get(self.url+"/users/api-pro/v1/team-users/{}/".format(team_user_id)).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to retrieve team user details (pro edition only): {}".format(e))
 
@@ -819,7 +819,7 @@ class PatrowlManagerApi:
         :rtype: json
         """
         try:
-            return self.sess.delete(self.url+"/api-pro/v1/team-users/{}/".format(team_user_id)).json()
+            return self.sess.delete(self.url+"/users/api-pro/v1/team-users/{}/".format(team_user_id)).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to delete team user details (pro edition only): {}".format(e))
 
@@ -841,7 +841,7 @@ class PatrowlManagerApi:
             'is_admin': is_admin,
         }
         try:
-            return self.sess.post(self.url+"/api-pro/v1/team-users/", data=data).json()
+            return self.sess.post(self.url+"/users/api-pro/v1/team-users/", data=data).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to create team user (pro edition only): {}".format(e))
 
@@ -855,6 +855,6 @@ class PatrowlManagerApi:
         :rtype: json
         """
         try:
-            return self.sess.get(self.url+"/api-pro/v1/admin/stats").json()
+            return self.sess.get(self.url+"/users/api-pro/v1/admin/stats").json()
         except requests.exceptions.RequestException as e:
             raise PatrowlException("Unable to get global usage stats (pro edition only): {}".format(e))

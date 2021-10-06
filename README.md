@@ -1,5 +1,5 @@
 # Patrowl4py
-Python API Client for PatrowlManager, PatrowlEngines and PAtrowlArsenal
+Python API Client for PatrowlManager, PatrowlEngines and PatrowlArsenal
 
 # Pypi Deployment commands
 ```
