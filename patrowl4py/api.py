@@ -178,6 +178,35 @@ class PatrowlManagerApi:
             '/assets/api/v1/delete/{}'.format(asset_id),
             'Unable to delete asset')
 
+    def edit_asset(self, asset_id, name, description, criticity, tags):
+        """
+        Edit an asset
+
+        :param asset_id: Asset ID
+        :param name: Name of the asset
+        :param description: Description
+        :param criticity: Criticity (low, medium, high)
+        :type tags: list of str
+        :rtype: json
+        """
+        if not criticity or not any(criticity in d for d in ASSET_CRITICITIES):
+            raise PatrowlException("Unable to edit assetgroup (criticity error): {}".format(criticity))
+        if tags is None or not isinstance(tags, list):
+            raise PatrowlException("Unable to edit assetgroup (tags error): {}".format(tags))
+
+        data = {
+            "name": name,
+            "description": description,
+            "criticity": criticity,
+            "tags": tags
+        }
+
+        return self.patrowl_request(
+            self.sess.post,
+            '/assets/api/v1/edit/{}'.format(asset_id),
+            'Unable to edit asset',
+            payload=data)
+
     def get_assetgroups(self):
         """
         Get all asset groups.
