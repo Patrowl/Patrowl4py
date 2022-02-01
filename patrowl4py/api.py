@@ -364,6 +364,18 @@ class PatrowlManagerApi:
             '/findings/api/v1/by-id/{}'.format(finding_id),
             'Unable to retrieve finding')
 
+    def get_findings_by_scan(self, scan_id):
+        """
+        Get findings attached to a scan.
+
+        :param finding_id: Scan ID
+        :rtype: json
+        """
+        return self.patrowl_request(
+            self.sess.get,
+            '/findings/api/v1/scan/{}'.format(scan_id),
+            'Unable to retrieve findings')
+
     def ack_finding(self, finding_id):
         """
         Ack an finding identified by his ID.
