@@ -37,7 +37,7 @@ class PatrowlManagerApi:
         try:
             req = request(self.url+path, data=payload)
             if not req.ok:
-                raise PatrowlException("{}: {}".format(error_message, req.text))
+                raise PatrowlException("{}: {}".format(error_message, req.raise_for_status()))
             return req.json()
         except requests.exceptions.RequestException as err_msg:
             raise PatrowlException("{}: {}".format(error_message, err_msg))
